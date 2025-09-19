@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills Overlap Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .diagram-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        
+        .venn-container {
+            flex: 2;
+            position: relative;
+            height: 600px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .skill-circle {
+            position: absolute;
+            border: 3px solid;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .skill-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .communication { 
+            width: 180px; height: 180px; 
+            top: 50px; left: 200px; 
+            border-color: #e74c3c; color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+        .critical-thinking { 
+            width: 180px; height: 180px; 
+            top: 50px; right: 200px; 
+            border-color: #3498db; color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        .creativity { 
+            width: 180px; height: 180px; 
+            top: 180px; left: 50px; 
+            border-color: #f39c12; color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+        .emotional-intelligence { 
+            width: 180px; height: 180px; 
+            top: 180px; right: 50px; 
+            border-color: #9b59b6; color: #9b59b6;
+            background: rgba(155, 89, 182, 0.1);
+        }
+        .adaptability { 
+            width: 180px; height: 180px; 
+            top: 320px; left: 150px; 
+            border-color: #2ecc71; color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+        }
+        .decision-making { 
+            width: 180px; height: 180px; 
+            top: 320px; right: 150px; 
+            border-color: #e67e22; color: #e67e22;
+            background: rgba(230, 126, 34, 0.1);
+        }
+        .collaboration { 
+            width: 180px; height: 180px; 
+            top: 220px; left: 50%; 
+            transform: translateX(-50%);
+            border-color: #1abc9c; color: #1abc9c;
+            background: rgba(26, 188, 156, 0.1);
+        }
+        
+        .info-panel {
+            flex: 1;
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            height: 600px;
+            overflow-y: auto;
+        }
+        
+        .info-panel h3 {
+            color: #3498db;
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        
+        .overlap-item {
+            background: rgba(52, 152, 219, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .overlap-item h4 {
+            color: #ecf0f1;
+            margin: 0 0 8px 0;
+            font-size: 1.1em;
+        }
+        
+        .overlap-item p {
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #bdc3c7;
+        }
+        
+        .instructions {
+            background: rgba(155, 89, 182, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .instructions p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #ecf0f1;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .skill-circle.active {
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
+        }
+        
+        .overlap-examples {
+            margin-top: 20px;
+        }
+        
+        .example {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            border-left: 3px solid #2ecc71;
+        }
+        
+        .example strong {
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Skills Interconnection Map</h1>
+        <div class="diagram-container">
+            <div class="venn-container">
+                <div class="skill-circle communication" data-skill="communication">Communication</div>
+                <div class="skill-circle critical-thinking" data-skill="critical-thinking">Critical<br>Thinking</div>
+                <div class="skill-circle creativity" data-skill="creativity">Creativity</div>
+                <div class="skill-circle emotional-intelligence" data-skill="emotional-intelligence">Emotional<br>Intelligence</div>
+                <div class="skill-circle adaptability" data-skill="adaptability">Adaptability</div>
+                <div class="skill-circle decision-making" data-skill="decision-making">Decision<br>Making</div>
+                <div class="skill-circle collaboration" data-skill="collaboration">Collaboration</div>
+            </div>
+            
+            <div class="info-panel">
+                <div class="instructions">
+                    <p><strong>Hover over skills</strong> to explore their interconnections and see how they complement each other in professional contexts.</p>
+                </div>
+                
+                <div id="info-content">
+                    <h3>Skill Interconnections</h3>
+                    <p>These seven skills form a sophisticated ecosystem where each enhances the others. Select a skill to explore its relationships.</p>
+                    
+                    <div class="overlap-examples">
+                        <h4 style="color: #3498db; margin-top: 20px;">Key Overlaps:</h4>
+                        
+                        <div class="example">
+                            <strong>Communication × Emotional Intelligence:</strong> Reading audience needs and adapting message delivery for maximum impact.
+                        </div>
+                        
+                        <div class="example">
+                            <strong>Critical Thinking × Decision Making:</strong> Systematic evaluation of options using logic and evidence.
+                        </div>
+                        
+                        <div class="example">
+                            <strong>Creativity × Adaptability:</strong> Generating novel solutions when facing unexpected challenges.
+                        </div>
+                        
+                        <div class="example">
+                            <strong>Collaboration × Communication:</strong> Building consensus through clear dialogue and active listening.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const skillData = {
+            'communication': {
+                title: 'Communication',
+                description: 'The foundation for sharing ideas, building relationships, and creating understanding.',
+                overlaps: [
+                    {
+                        with: 'Emotional Intelligence',
+                        connection: 'Reading emotional cues to tailor communication style and approach for different audiences.'
+                    },
+                    {
+                        with: 'Collaboration',
+                        connection: 'Essential for building trust, resolving conflicts, and creating shared understanding in teams.'
+                    },
+                    {
+                        with: 'Critical Thinking',
+                        connection: 'Presenting logical arguments clearly and questioning assumptions through dialogue.'
+                    },
+                    {
+                        with: 'Creativity',
+                        connection: 'Finding innovative ways to express complex ideas and engage different audiences.'
+                    }
+                ]
+            },
+            'critical-thinking': {
+                title: 'Critical Thinking',
+                description: 'The ability to analyse information objectively and make reasoned judgements.',
+                overlaps: [
+                    {
+                        with: 'Decision Making',
+                        connection: 'Evaluating evidence systematically to make informed choices and avoid cognitive biases.'
+                    },
+                    {
+                        with: 'Communication',
+                        connection: 'Constructing logical arguments and identifying flaws in reasoning during discussions.'
+                    },
+                    {
+                        with: 'Creativity',
+                        connection: 'Challenging assumptions and exploring alternative perspectives to generate new insights.'
+                    },
+                    {
+                        with: 'Adaptability',
+                        connection: 'Reassessing situations objectively when circumstances change unexpectedly.'
+                    }
+                ]
+            },
+            'creativity': {
+                title: 'Creativity',
+                description: 'Generating original ideas and finding innovative solutions to complex problems.',
+                overlaps: [
+                    {
+                        with: 'Adaptability',
+                        connection: 'Inventing novel approaches when traditional methods fail or environments change.'
+                    },
+                    {
+                        with: 'Critical Thinking',
+                        connection: 'Evaluating creative ideas rigorously to determine their viability and potential impact.'
+                    },
+                    {
+                        with: 'Communication',
+                        connection: 'Presenting ideas in compelling ways and finding creative metaphors to explain concepts.'
+                    },
+                    {
+                        with: 'Collaboration',
+                        connection: 'Building on others\' ideas through creative synthesis and collective brainstorming.'
+                    }
+                ]
+            },
+            'emotional-intelligence': {
+                title: 'Emotional Intelligence',
+                description: 'Understanding and managing emotions in yourself and others.',
+                overlaps: [
+                    {
+                        with: 'Communication',
+                        connection: 'Adapting communication style based on emotional context and audience needs.'
+                    },
+                    {
+                        with: 'Collaboration',
+                        connection: 'Managing team dynamics, resolving conflicts, and creating psychological safety.'
+                    },
+                    {
+                        with: 'Decision Making',
+                        connection: 'Recognising how emotions influence choices and managing them for better outcomes.'
+                    },
+                    {
+                        with: 'Adaptability',
+                        connection: 'Managing emotional responses to change and helping others navigate transitions.'
+                    }
+                ]
+            },
+            'adaptability': {
+                title: 'Adaptability',
+                description: 'Flexibility in adjusting to new conditions and embracing change.',
+                overlaps: [
+                    {
+                        with: 'Creativity',
+                        connection: 'Generating innovative solutions when faced with unexpected challenges or constraints.'
+                    },
+                    {
+                        with: 'Critical Thinking',
+                        connection: 'Rapidly reassessing situations and updating mental models based on new information.'
+                    },
+                    {
+                        with: 'Emotional Intelligence',
+                        connection: 'Managing stress and uncertainty whilst supporting others through transitions.'
+                    },
+                    {
+                        with: 'Decision Making',
+                        connection: 'Making quick decisions with incomplete information in rapidly changing environments.'
+                    }
+                ]
+            },
+            'decision-making': {
+                title: 'Decision Making',
+                description: 'Choosing the best course of action from available alternatives.',
+                overlaps: [
+                    {
+                        with: 'Critical Thinking',
+                        connection: 'Systematically evaluating options using logic, evidence, and structured analysis.'
+                    },
+                    {
+                        with: 'Emotional Intelligence',
+                        connection: 'Understanding how emotions affect judgement and considering stakeholder feelings.'
+                    },
+                    {
+                        with: 'Collaboration',
+                        connection: 'Involving others in decision processes and building consensus around choices.'
+                    },
+                    {
+                        with: 'Adaptability',
+                        connection: 'Adjusting decisions quickly when new information emerges or conditions change.'
+                    }
+                ]
+            },
+            'collaboration': {
+                title: 'Collaboration',
+                description: 'Working effectively with others to achieve shared goals.',
+                overlaps: [
+                    {
+                        with: 'Communication',
+                        connection: 'Creating clear channels for information sharing and building mutual understanding.'
+                    },
+                    {
+                        with: 'Emotional Intelligence',
+                        connection: 'Managing interpersonal dynamics and creating inclusive, supportive team environments.'
+                    },
+                    {
+                        with: 'Creativity',
+                        connection: 'Leveraging diverse perspectives to generate innovative solutions collectively.'
+                    },
+                    {
+                        with: 'Decision Making',
+                        connection: 'Facilitating group decision processes and building consensus around complex issues.'
+                    }
+                ]
+            }
+        };
+        
+        const circles = document.querySelectorAll('.skill-circle');
+        const infoContent = document.getElementById('info-content');
+        
+        circles.forEach(circle => {
+            circle.addEventListener('mouseenter', () => {
+                const skill = circle.dataset.skill;
+                const data = skillData[skill];
+                
+                circle.classList.add('active');
+                
+                let overlapsHtml = data.overlaps.map(overlap => `
+                    <div class="overlap-item">
+                        <h4>${data.title} × ${overlap.with}</h4>
+                        <p>${overlap.connection}</p>
+                    </div>
+                `).join('');
+                
+                infoContent.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <p>${data.description}</p>
+                    <div class="overlap-examples">
+                        <h4 style="color: #3498db; margin-top: 20px;">Key Intersections:</h4>
+                        ${overlapsHtml}
+                    </div>
+                `;
+            });
+            
+            circle.addEventListener('mouseleave', () => {
+                circle.classList.remove('active');
+            });
+        });
+        
+        // Reset info panel when not hovering over any skill
+        document.addEventListener('mouseover', (e) => {
+            if (!e.target.classList.contains('skill-circle')) {
+                setTimeout(() => {
+                    if (!document.querySelector('.skill-circle:hover')) {
+                        infoContent.innerHTML = `
+                            <h3>Skill Interconnections</h3>
+                            <p>These seven skills form a sophisticated ecosystem where each enhances the others. Hover over a skill to explore its relationships.</p>
+                            
+                            <div class="overlap-examples">
+                                <h4 style="color: #3498db; margin-top: 20px;">Key Overlaps:</h4>
+                                
+                                <div class="example">
+                                    <strong>Communication × Emotional Intelligence:</strong> Reading audience needs and adapting message delivery for maximum impact.
+                                </div>
+                                
+                                <div class="example">
+                                    <strong>Critical Thinking × Decision Making:</strong> Systematic evaluation of options using logic and evidence.
+                                </div>
+                                
+                                <div class="example">
+                                    <strong>Creativity × Adaptability:</strong> Generating novel solutions when facing unexpected challenges.
+                                </div>
+                                
+                                <div class="example">
+                                    <strong>Collaboration × Communication:</strong> Building consensus through clear dialogue and active listening.
+                                </div>
+                            </div>
+                        `;
+                    }
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
